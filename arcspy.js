@@ -28,8 +28,8 @@ class Modal {
     createTitleModal(content) {
         const modalTitle = document.createElement('h1');
 
-        modalTitle.setAttribute('data-v-4d610083', '');
-        modalTitle.setAttribute('data-v-1d7e16ac', '');
+        modalTitle.setAttribute('data-v-130d372e', '');
+        modalTitle.setAttribute('data-v-1d560cf2', '');
         modalTitle.classList.add('modal-playersite', 'modal-title');
         modalTitle.style.fontSize = '28px';
         modalTitle.textContent = content;
@@ -84,9 +84,9 @@ class Modal {
         const btnModal = document.createElement('div');
 
         btnModal.setAttribute('data-v-60945ec8', '');
-        btnModal.setAttribute('data-v-4d610083', '');
+        btnModal.setAttribute('data-v-130d372e', '');
         btnModal.classList.add('btn-modal', theme);
-        btnModal.setAttribute('data-v-1d7e16ac', '');
+        btnModal.setAttribute('data-v-1d560cf2', '');
         btnModal.textContent = content;
 
         return btnModal;
@@ -95,8 +95,8 @@ class Modal {
     getInitializedBodyModal() {
         const bodyModal = document.createElement('div');
 
-        bodyModal.setAttribute('data-v-4d610083', '');
-        bodyModal.setAttribute('data-v-1d7e16ac', '');
+        bodyModal.setAttribute('data-v-130d372e', '');
+        bodyModal.setAttribute('data-v-1d560cf2', '');
         bodyModal.style.display = "flex";
         bodyModal.style.flexDirection = "column";
         bodyModal.style.alignItems = "center";
@@ -108,7 +108,7 @@ class Modal {
     getInitializedModalAction() {
         const modalAction = document.createElement('div');
 
-        modalAction.setAttribute('data-v-1d7e16ac', '');
+        modalAction.setAttribute('data-v-1d560cf2', '');
         modalAction.classList.add('modal-action');
 
         return modalAction;
@@ -117,14 +117,14 @@ class Modal {
     getInitializedModalBody() {
         const modalBody = document.createElement('div');
 
-        modalBody.setAttribute('data-v-1d7e16ac', '');
+        modalBody.setAttribute('data-v-1d560cf2', '');
         modalBody.classList.add('modal-body');
 
         return modalBody;
     };
 
     _setModalBody(body) {
-        body.setAttribute('data-v-1d7e16ac', '');
+        body.setAttribute('data-v-1d560cf2', '');
         body.classList.add('modal-body');
 
         return body;
@@ -157,31 +157,31 @@ class Modal {
         this.modalBody = body;
 
         this.modalMask = document.createElement('div');
-        this.modalMask.setAttribute('data-v-1d7e16ac', '');
-        this.modalMask.setAttribute('data-v-4d610083', '');
+        this.modalMask.setAttribute('data-v-1d560cf2', '');
+        this.modalMask.setAttribute('data-v-130d372e', '');
         this.modalMask.style.opacity = 0;
         this.modalMask.style.transition = 'all .3s';
         this.modalMask.classList.add('modal-mask');
 
         const modalWrapper = document.createElement('div');
-        modalWrapper.setAttribute('data-v-1d7e16ac', '');
+        modalWrapper.setAttribute('data-v-1d560cf2', '');
         modalWrapper.classList.add('modal-wrapper');
 
         const modalContainer = document.createElement('div');
-        modalContainer.setAttribute('data-v-1d7e16ac', '');
+        modalContainer.setAttribute('data-v-1d560cf2', '');
         modalContainer.style.paddingBottom = "20px";
         modalContainer.style.overflow = "auto";
         modalContainer.classList.add('modal-container');
 
         const closeButton = document.createElement('i');
-        closeButton.setAttribute('data-v-1d7e16ac', '');
+        closeButton.setAttribute('data-v-1d560cf2', '');
         closeButton.classList.add('close');
         closeButton.textContent = '✕';
         closeButton.addEventListener('click', () => {this.closeModal()});
         modalContainer.appendChild(closeButton);
 
         const modalHeader = document.createElement('div');
-        modalHeader.setAttribute('data-v-1d7e16ac', '');
+        modalHeader.setAttribute('data-v-1d560cf2', '');
         modalHeader.classList.add('modal-header');
 
         const modalTitle = this.createTitleModal(this.modalTitle);
@@ -190,12 +190,12 @@ class Modal {
         modalContainer.appendChild(modalHeader);
 
         const hr = document.createElement('hr');
-        hr.setAttribute('data-v-1d7e16ac', '');
+        hr.setAttribute('data-v-1d560cf2', '');
         hr.classList.add('top');
         modalContainer.appendChild(hr);
 
         const modalBody = document.createElement('div');
-        modalBody.setAttribute('data-v-1d7e16ac', '');
+        modalBody.setAttribute('data-v-1d560cf2', '');
         modalBody.classList.add('modal-body');
 
         const bodyModal = this.modalBody;
