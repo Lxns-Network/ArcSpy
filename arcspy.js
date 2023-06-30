@@ -1,11 +1,16 @@
 // ==UserScript==
 // @name         ArcSpy for LxBot
-// @namespace    http://tampermonkey.net/
+// @namespace    https://github.com/Lxns-Network/ArcSpy
 // @version      0.1
 // @description  A tool for Arcaea player to crawl their score data, and upload it to LxBot server.
 // @author       Lxns Network
 // @match        https://arcaea.lowiro.com/*/profile/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=lowiro.com
+// @homepage     https://github.com/Lxns-Network/ArcSpy
+// @homepageURL  https://github.com/Lxns-Network/ArcSpy
+// @downloadURL  https://github.com/Lxns-Network/ArcSpy/raw/main/arcspy.js
+// @updateURL    https://github.com/Lxns-Network/ArcSpy/raw/main/arcspy.js
+// @supportURL   https://github.com/Lxns-Network/ArcSpy/issues
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
