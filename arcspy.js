@@ -48,19 +48,19 @@ class Modal {
 
     _initModalDataAttribute() {
         document.styleSheets.forEach((sheet, i) => {
-            if (sheet.href == null) {
+            if (sheet.href === null) {
                 return;
-            };
-            if (sheet.href.indexOf("index") != -1) {
+            }
+            if (sheet.href.indexOf("index") !== -1) {
                 sheet.rules.forEach((rule, j) => {
-                    if (rule.selectorText == null) {
+                    if (rule.selectorText === null) {
                         return;
-                    };
-                    if (rule.selectorText.indexOf(".modal-wrapper") != -1) {
+                    }
+                    if (rule.selectorText.indexOf(".modal-wrapper") !== -1) {
                         this.modalDataAttribute = rule.selectorText.replace(/\.modal-wrapper\[(.+)\]/, "$1");
-                    };
+                    }
                 });
-            };
+            }
         });
     };
 
@@ -279,15 +279,15 @@ class Modal {
             const key = decodeURIComponent(keyValue[0]);
             const value = decodeURIComponent(keyValue[1] || "");
             params[key] = value;
-        };
+        }
 
         return params;
-    };
+    }
 
     function syncSongList(force=false) {
         let songListUrl = GM_getValue("songListUrl");
 
-        if (songList == undefined || force) {
+        if (songList === undefined || force) {
             console.log("正在同步曲目列表...");
 
             GM_xmlhttpRequest({
@@ -300,7 +300,7 @@ class Modal {
                 }
             });
         }
-    };
+    }
 
     function calcPotential(score=0, songRatingFloat=0) {
         let potential;
@@ -312,14 +312,14 @@ class Modal {
             potential = Math.max(songRatingFloat + (score - 9500000) / 300000, 0);
         }
         return potential;
-    };
+    }
 
     function getSortedSongRatingList(testSongList) {
         let _songList = songList;
 
-        if (testSongList != undefined) {
+        if (testSongList !== undefined) {
             _songList = testSongList;
-        };
+        }
 
         const songRatingList = {};
 
@@ -330,7 +330,7 @@ class Modal {
         return Object.entries(songRatingList)
         .flatMap(([key, value]) => value.map((v, i) => ({ key, value: v, index: i })))
         .sort((a, b) => b.value - a.value);
-    };
+    }
 
     /*
     获取成绩
@@ -339,7 +339,7 @@ class Modal {
         const start = performance.now();
 
         const cachedPlayer = getCachedPlayers().find(user => user.user_code === friendCode);
-        if (cachedPlayer == undefined) {
+        if (cachedPlayer === undefined) {
             alert("未在缓存中找到目标账号，请确认是否登录过目标账号并使用“缓存用户详情”功能");
             return [];
         }
@@ -353,7 +353,7 @@ class Modal {
         let endpoint = "score/song/friend";
         if (isSelf) {
             endpoint = "score/song/me";
-        };
+        }
 
         // 开始遍历定数，从大至小进行查询
         let index = 0;
@@ -361,7 +361,7 @@ class Modal {
             if (index >= sortedSongRatingList.length) {
                 const end = performance.now();
                 clearInterval(intervalId);
-                if (scores.length != 0) {
+                if (scores.length !== 0) {
                     processText.textContent = `爬取了 ${scores.length} 个成绩，耗时 ${((end - start) / 1000).toFixed()} 秒`;
                     document.getElementById("arcspy-upload-button").style.display = "flex";
                     document.getElementById("arcspy-back-button").style.display = "flex";
@@ -374,8 +374,8 @@ class Modal {
                     document.getElementById("arcspy-back-button").style.display = "flex";
                     document.getElementById("arcspy-interrupt-button").style.display = "none";
                     return [];
-                };
-            };
+                }
+            }
 
             const song = sortedSongRatingList[index++];
 
@@ -386,7 +386,7 @@ class Modal {
                     alert(`曲目 ${song.key} [${DIFFICULTY_NAME[song.index]}] 获取失败，错误码：${response.error_code}`);
                     openScoreQueryModal();
                     return;
-                };
+                }
                 if (scores.length >= maxScoreCount) {
                     scores.sort((a, b) => b.rating - a.rating);
                     scores = scores.slice(0, 40);
@@ -401,9 +401,9 @@ class Modal {
                             document.getElementById("arcspy-upload-button").style.display = "flex";
                             document.getElementById("arcspy-back-button").style.display = "flex";
                             document.getElementById("arcspy-interrupt-button").style.display = "none";
-                        };
+                        }
                         applyProcessPercentage(percent);
-                    };
+                    }
                     if (songMaxRating < playerMinRating) {
                         console.log(scores);
                         savePlayerScores(userId, scores);
@@ -412,24 +412,24 @@ class Modal {
                     }
                 } else {
                     applyProcessPercentage(index / sortedSongRatingList.length);
-                };
+                }
                 response.value.forEach((player, j) => {
-                    if (player.user_id == userId) {
+                    if (player.user_id === userId) {
                         player.rating = calcPotential(player.score, song.value / 10);
                         console.log(player);
                         scores.push(player);
-                    };
+                    }
                 });
             }).catch((error) => {
                 console.error(error);
             });
         }, scoreQueryInterval);
-    };
+    }
 
     function savePlayerScores(userId, scores) {
         let cachedScores = localStorage.getItem("scores");
 
-        if (cachedScores == null) {
+        if (cachedScores === null) {
             cachedScores = {};
         } else {
             cachedScores = JSON.parse(cachedScores);
@@ -439,13 +439,13 @@ class Modal {
 
         localStorage.setItem("scores", JSON.stringify(cachedScores));
         return cachedScores;
-    };
+    }
 
     function requestAPI(method, endpoint, data) {
         let headers = null;
         let formData = null;
 
-        if (method == "POST") {
+        if (method === "POST") {
             let params = parseQueryString(data);
 
             headers = {
@@ -455,10 +455,10 @@ class Modal {
 
             for (const key in params) {
                 formData += `--${BOUNDARY}\r\nContent-Disposition: form-data; name="${key}"\r\n\r\n${params[key]}\r\n`;
-            };
+            }
 
             formData += `--${BOUNDARY}--\r\n`;
-        };
+        }
 
         return new Promise((resolve, reject) => {
             console.log(`> https://webapi.lowiro.com/webapi/${endpoint}`);
@@ -470,16 +470,16 @@ class Modal {
                 onload: (responseDetails) => {
                     const response = JSON.parse(responseDetails.responseText);
                     console.log(response);
-                    if (saveCookie && endpoint == "user/me") {
+                    if (saveCookie && endpoint === "user/me") {
                         const sessionId = responseDetails.responseHeaders.match(/sid=(.+?);/)[1];
                         savePlayerCookie(response.value.user_id, sessionId);
-                    };
+                    }
                     resolve(response);
                 },
                 onerror: (error) => reject(error)
             });
         });
-    };
+    }
 
     function validateSongListUrl(testSongListUrl) {
         return new Promise((resolve) => {
@@ -498,7 +498,7 @@ class Modal {
                 onerror: (error) => resolve(false)
             });
         });
-    };
+    }
 
     function applyProcessPercentage(percent) {
         const processPercentageModal = document.getElementById("arcspy-process-percentage");
@@ -506,7 +506,7 @@ class Modal {
 
         const processBarFill = document.getElementById("arcspy-process-bar-fill");
         processBarFill.style.width = `${(0.9 * percent) * 100}%`;
-    };
+    }
 
     /*
     成绩爬取进度窗口
@@ -573,7 +573,7 @@ class Modal {
         modalBody.appendChild(modalAction);
 
         arcSpyModal.setModalBody('爬取成绩', modalBody);
-    };
+    }
 
     /*
     成绩查询窗口
@@ -615,28 +615,28 @@ class Modal {
                 if (!response.success) {
                     alert("用户详情获取失败，错误码：" + response.error_code);
                     return;
-                };
-                if (response.value.user_code != friendCode && Date.now() - response.value.arcaea_online_expire_ts > 0) {
+                }
+                if (response.value.user_code !== friendCode && Date.now() - response.value.arcaea_online_expire_ts > 0) {
                     alert("受官方接口限制，您需要订阅 Arcaea Online 才能查询其他账号。");
                     return;
-                };
+                }
                 return requestAddFriend(friendCode);
             }).then((response) => {
                 let useSongMeAPI = false;
                 if (!response.success) {
-                    if (response.error_code == 604) {
+                    if (response.error_code === 604) {
                         if (!confirm("警告！您正在尝试查询您现在登录的账号，“确定”以继续查询。")) {
                             return;
-                        };
+                        }
                         useSongMeAPI = true;
-                    } else if (response.error_code == 401) {
+                    } else if (response.error_code === 401) {
                         alert("玩家不存在。");
                         return;
-                    } else if (response.error_code != 602) {
+                    } else if (response.error_code !== 602) {
                         alert("好友添加失败，错误码：" + response.error_code);
                         return;
-                    };
-                };
+                    }
+                }
                 openQueryProcessModal();
                 getPlayerScores(friendCode, useSongMeAPI);
             }).catch((error) => {
@@ -653,7 +653,7 @@ class Modal {
         modalBody.appendChild(modalAction);
 
         arcSpyModal.setModalBody('爬取成绩', modalBody);
-    };
+    }
 
     /*
     脚本设置窗口
@@ -707,15 +707,15 @@ class Modal {
                 } else {
                     scoreQueryInterval = parseInt(scoreQueryIntervalInputModal.value);
                     GM_setValue("scoreQueryInterval", scoreQueryInterval);
-                };
+                }
             });
 
-            if (parseInt(scoreQueryIntervalInputModal.value) == NaN) {
+            if (parseInt(scoreQueryIntervalInputModal.value) === NaN) {
                 alert("保存失败，请输入有效的爬取间隔时间。");
             } else {
                 scoreQueryInterval = parseInt(scoreQueryIntervalInputModal.value);
                 GM_setValue("scoreQueryInterval", scoreQueryInterval);
-            };
+            }
 
             saveCookie = document.getElementById("arcspy-save-cookie-input").checked;
             GM_setValue("saveCookie", saveCookie);
@@ -739,7 +739,7 @@ class Modal {
         modalBody.appendChild(modalAction);
 
         arcSpyModal.setModalBody('ArcSpy 设置', modalBody);
-    };
+    }
 
     /*
     上传窗口
@@ -774,12 +774,12 @@ class Modal {
             const playerSelectModal = document.getElementById("arcspy-player-select");
             const player = getCachedPlayers().find(user => user.user_id === parseInt(playerSelectModal.value));
 
-            const cachedScores = JSON.parse(localStorage.getItem("scores"))
+            const cachedScores = JSON.parse(localStorage.getItem("scores"));
 
-            if (cachedScores == null || cachedScores[player.user_id] == undefined) {
+            if (cachedScores === null || cachedScores[player.user_id] === undefined) {
                 alert("没有找到该玩家的成绩数据，请先使用“爬取成绩”功能保存。");
                 return;
-            };
+            }
 
             const uploadData = {
                 player: player,
@@ -798,7 +798,7 @@ class Modal {
         modalBody.appendChild(modalAction);
 
         arcSpyModal.setModalBody('上传至 LxBot', modalBody);
-    };
+    }
 
     /*
     关于窗口
@@ -837,7 +837,7 @@ class Modal {
         modalBody.appendChild(modalAction);
 
         arcSpyModal.setModalBody('关于 ArcSpy', modalBody);
-    };
+    }
 
     /*
     主窗口
@@ -858,7 +858,7 @@ class Modal {
                 if (!response.success) {
                     alert("用户详情获取失败，错误码：" + response.error_code);
                     return;
-                };
+                }
                 savePlayerInfo(response.value);
                 alert(`玩家 ${response.value.name} 缓存成功。`);
                 saveBtnModal.classList.remove('disabled');
@@ -887,36 +887,36 @@ class Modal {
         modalBody.appendChild(bodyModal);
         modalBody.appendChild(modalAction);
 
-        if (arcSpyModal.modalBody != null) {
+        if (arcSpyModal.modalBody !== null) {
             arcSpyModal.setModalBody('ArcSpy for LxBot', modalBody);
             return;
-        };
+        }
         arcSpyModal.createModal('ArcSpy for LxBot', modalBody);
-    };
+    }
 
     function savePlayerCookie(userId, sessionId) {
         let cookies = localStorage.getItem("cookies");
 
-        if (cookies == null) {
+        if (cookies === null) {
             cookies = {};
         } else {
             cookies = JSON.parse(cookies);
-        };
+        }
 
         cookies[userId] = sessionId;
 
         localStorage.setItem("cookies", JSON.stringify(cookies));
         return;
-    };
+    }
 
     function savePlayerInfo(data) {
         let players = localStorage.getItem("players");
 
-        if (players == null) {
+        if (players === null) {
             players = []
         } else {
             players = JSON.parse(players);
-        };
+        }
 
         if (players.some(player => player.user_id === data.user_id)) {
             // 如果玩家被缓存了，就更新缓存
@@ -924,21 +924,21 @@ class Modal {
         } else {
             // 如果玩家没有被缓存，就添加到缓存中
             players.push(data)
-        };
+        }
 
         localStorage.setItem("players", JSON.stringify(players));
         return players;
-    };
+    }
 
     function getCachedPlayers() {
         let players = localStorage.getItem("players");
 
-        if (players == null) {
+        if (players === null) {
             return [];
         }
 
         return JSON.parse(players);
-    };
+    }
 
     function requestAddFriend(friendCode) {
         return new Promise((resolve, reject) => {
@@ -948,7 +948,7 @@ class Modal {
                 reject(error);
             });
         });
-    };
+    }
 
     function initArcSpySidebarButton() {
         let title = document.createElement("span");
@@ -982,40 +982,40 @@ class Modal {
         });
         navLink.appendChild(title);
         navLink.appendChild(button);
-    };
+    }
 
     function setDefaultConfig(reset=false) {
-        if (songListUrl == undefined || reset) {
+        if (songListUrl === undefined || reset) {
             songListUrl = "https://raw.githubusercontent.com/Arcaea-Infinity/ArcaeaSongDatabase/main/arcsong.json";
             GM_setValue("songListUrl", songListUrl);
-        };
-        if (scoreQueryInterval == undefined || reset) {
+        }
+        if (scoreQueryInterval === undefined || reset) {
             scoreQueryInterval = 5000;
             GM_setValue("scoreQueryInterval", scoreQueryInterval);
-        };
-        if (saveCookie == undefined || reset) {
+        }
+        if (saveCookie === undefined || reset) {
             saveCookie = false;
             GM_setValue("saveCookie", saveCookie);
-        };
-        if (maxScoreCount == undefined || reset) {
+        }
+        if (maxScoreCount === undefined || reset) {
             maxScoreCount = 40;
             GM_setValue("maxScoreCount", maxScoreCount);
-        };
-    };
+        }
+    }
 
     setDefaultConfig();
     syncSongList();
 
     setInterval(() => {
         if (/profile/.test(location.href)) {
-            if (document.getElementById("arcspy") == null) {
+            if (document.getElementById("arcspy") === null) {
                 try {
                     // 自动注入 ArcSpy 到侧边栏
                     initArcSpySidebarButton();
                 } catch (error) {
                     return;
-                };
-            };
-        };
+                }
+            }
+        }
     }, 500);
 })();
