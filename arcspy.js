@@ -710,7 +710,7 @@ class Modal {
                 }
             });
 
-            if (parseInt(scoreQueryIntervalInputModal.value) === NaN) {
+            if (isNaN(parseInt(scoreQueryIntervalInputModal.value))) {
                 alert("保存失败，请输入有效的爬取间隔时间。");
             } else {
                 scoreQueryInterval = parseInt(scoreQueryIntervalInputModal.value);
