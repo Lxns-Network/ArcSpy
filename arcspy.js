@@ -345,7 +345,7 @@ class Modal {
         }
         const userId = cachedPlayer.user_id;
 
-        const scores = [];
+        let scores = [];
         const sortedSongRatingList = getSortedSongRatingList();
 
         const processText = document.getElementById("arcspy-process-text");
@@ -774,7 +774,7 @@ class Modal {
             const playerSelectModal = document.getElementById("arcspy-player-select");
             const player = getCachedPlayers().find(user => user.user_id === parseInt(playerSelectModal.value));
 
-            const cachedScores = localStorage.getItem("scores");
+            const cachedScores = JSON.parse(localStorage.getItem("scores"))
 
             if (cachedScores == null || cachedScores[player.user_id] == undefined) {
                 alert("没有找到该玩家的成绩数据，请先使用“爬取成绩”功能保存。");
