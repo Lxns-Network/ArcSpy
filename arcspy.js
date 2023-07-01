@@ -48,12 +48,12 @@ class Modal {
 
     _initModalDataAttribute() {
         document.styleSheets.forEach((sheet, i) => {
-            if (sheet.href === null) {
+            if (sheet.href == null) {
                 return;
             }
             if (sheet.href.indexOf("index") !== -1) {
                 sheet.rules.forEach((rule, j) => {
-                    if (rule.selectorText === null) {
+                    if (rule.selectorText == null) {
                         return;
                     }
                     if (rule.selectorText.indexOf(".modal-wrapper") !== -1) {
@@ -429,7 +429,7 @@ class Modal {
     function savePlayerScores(userId, scores) {
         let cachedScores = localStorage.getItem("scores");
 
-        if (cachedScores === null) {
+        if (cachedScores == null) {
             cachedScores = {};
         } else {
             cachedScores = JSON.parse(cachedScores);
@@ -776,7 +776,7 @@ class Modal {
 
             const cachedScores = JSON.parse(localStorage.getItem("scores"));
 
-            if (cachedScores === null || cachedScores[player.user_id] === undefined) {
+            if (cachedScores == null || cachedScores[player.user_id] === undefined) {
                 alert("没有找到该玩家的成绩数据，请先使用“爬取成绩”功能保存。");
                 return;
             }
@@ -897,7 +897,7 @@ class Modal {
     function savePlayerCookie(userId, sessionId) {
         let cookies = localStorage.getItem("cookies");
 
-        if (cookies === null) {
+        if (cookies == null) {
             cookies = {};
         } else {
             cookies = JSON.parse(cookies);
@@ -912,7 +912,7 @@ class Modal {
     function savePlayerInfo(data) {
         let players = localStorage.getItem("players");
 
-        if (players === null) {
+        if (players == null) {
             players = []
         } else {
             players = JSON.parse(players);
@@ -933,7 +933,7 @@ class Modal {
     function getCachedPlayers() {
         let players = localStorage.getItem("players");
 
-        if (players === null) {
+        if (players == null) {
             return [];
         }
 
@@ -1008,7 +1008,7 @@ class Modal {
 
     setInterval(() => {
         if (/profile/.test(location.href)) {
-            if (document.getElementById("arcspy") === null) {
+            if (document.getElementById("arcspy") == null) {
                 try {
                     // 自动注入 ArcSpy 到侧边栏
                     initArcSpySidebarButton();
