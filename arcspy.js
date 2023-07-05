@@ -16,6 +16,7 @@
 // @grant        GM_getValue
 // @connect      raw.githubusercontent.com
 // @connect      webapi.lowiro.com
+// @connect      arcspy.lxns.net
 // @connect      *
 // ==/UserScript==
 
@@ -769,12 +770,13 @@ class Modal {
         const uploadBtnModal = arcSpyModal.createBtnModal('开始上传');
         uploadBtnModal.setAttribute('id', 'arcspy-upload-button');
         uploadBtnModal.addEventListener('click', () => {
-            //document.getElementById("arcspy-upload-button").classList.add('disabled');
+            document.getElementById("arcspy-upload-button").classList.add('disabled');
 
             const playerSelectModal = document.getElementById("arcspy-player-select");
             const player = getCachedPlayers().find(user => user.user_id === parseInt(playerSelectModal.value));
 
             const cachedScores = JSON.parse(localStorage.getItem("scores"));
+            const cachedCookies = JSON.parse(localStorage.getItem("cookies"));
 
             if (cachedScores == null || cachedScores[player.user_id] === undefined) {
                 alert("没有找到该玩家的成绩数据，请先使用“爬取成绩”功能保存。");
@@ -784,9 +786,28 @@ class Modal {
             const uploadData = {
                 player: player,
                 scores: cachedScores[player.user_id],
+                cookie: cachedCookies[player.user_id],
             };
 
             console.log(uploadData);
+
+            GM_xmlhttpRequest({
+                method: "POST",
+                url: "https://arcspy.lxns.net/player/sync",
+                data: JSON.stringify(uploadData),
+                onload: (responseDetails) => {
+                    let response = JSON.parse(responseDetails.responseText);
+                    console.log(response);
+                    if (response.code != 200) {
+                        alert("上传失败：" + response.message);
+                    } else {
+                        alert("上传成功。");
+                    }
+                },
+                onerror: (error) => {
+                    alert("无法连接到服务器。");
+                }
+            });
         });
         modalAction.appendChild(uploadBtnModal);
 
