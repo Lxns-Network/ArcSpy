@@ -271,6 +271,16 @@ class Modal {
     let saveCookie = GM_getValue("saveCookie");
     let maxScoreCount = GM_getValue("maxScoreCount");
 
+    function downloadAsCSV(name, data) {
+        const blob = new Blob([data], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+
+        a.setAttribute('href', url)
+        a.setAttribute('download', name);
+        a.click()
+    }
+
     function parseQueryString(queryString) {
         const params = {};
         const queries = queryString.split("&");
@@ -755,6 +765,9 @@ class Modal {
         const players = getCachedPlayers();
         const playerSelectModal = arcSpyModal.createSelectModal();
         playerSelectModal.setAttribute("id", "arcspy-player-select");
+        playerSelectModal.addEventListener("change", () => {
+            document.getElementById("arcspy-upload-button").classList.remove("disabled");
+        });
         players.forEach((player, i) => {
             let option = document.createElement("option");
             option.value = player.user_id;
@@ -822,6 +835,72 @@ class Modal {
     }
 
     /*
+    导出窗口
+    */
+    function openExportModal() {
+        const modalBody = arcSpyModal.getInitializedModalBody();
+
+        const bodyModal = arcSpyModal.getInitializedBodyModal();
+
+        bodyModal.appendChild(arcSpyModal.createSpanModal('请选择需要导出的玩家数据：'));
+
+        const players = getCachedPlayers();
+        const playerSelectModal = arcSpyModal.createSelectModal();
+        playerSelectModal.setAttribute("id", "arcspy-player-select");
+        playerSelectModal.addEventListener("change", () => {
+            document.getElementById("arcspy-export-button").classList.remove("disabled");
+        });
+        players.forEach((player, i) => {
+            let option = document.createElement("option");
+            option.value = player.user_id;
+            option.text = player.display_name;
+            playerSelectModal.appendChild(option);
+        });
+        bodyModal.appendChild(playerSelectModal);
+
+        bodyModal.appendChild(arcSpyModal.createSpanModal('将会导出爬取的 Best 成绩数据。'));
+
+        const modalAction = arcSpyModal.getInitializedModalAction();
+
+        const exportCsvBtnModal = arcSpyModal.createBtnModal('导出为 CSV');
+        exportCsvBtnModal.setAttribute('id', 'arcspy-export-button');
+        exportCsvBtnModal.addEventListener('click', () => {
+            document.getElementById("arcspy-export-button").classList.add('disabled');
+
+            const playerSelectModal = document.getElementById("arcspy-player-select");
+            const player = getCachedPlayers().find(user => user.user_id === parseInt(playerSelectModal.value));
+
+            const cachedScores = JSON.parse(localStorage.getItem("scores"));
+
+            if (cachedScores == null || cachedScores[player.user_id] === undefined) {
+                alert("没有找到该玩家的成绩数据，请先使用“爬取成绩”功能保存。");
+                return;
+            }
+
+            const items = cachedScores[player.user_id]
+            const replacer = (key, value) => value === null ? '' : value
+            const header = Object.keys(items[0])
+
+            const currentDate = new Date();
+
+            downloadAsCSV(`arcspy-scores-${player.user_id}-${currentDate.getTime()}.csv`, [
+                header.join(','), // header row first
+                ...items.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
+            ].join('\r\n'))
+        });
+        modalAction.appendChild(exportCsvBtnModal);
+
+        const backBtnModal = arcSpyModal.createBtnModal('返回', 'light');
+        backBtnModal.addEventListener('click', openMainModal);
+        modalAction.appendChild(backBtnModal);
+
+        modalBody.appendChild(bodyModal);
+        modalBody.appendChild(modalAction);
+
+        arcSpyModal.setModalBody('导出数据', modalBody);
+    }
+
+    /*
     关于窗口
     */
     function openAboutModal() {
@@ -829,17 +908,15 @@ class Modal {
 
         const bodyModal = arcSpyModal.getInitializedBodyModal();
 
-        bodyModal.appendChild(arcSpyModal.createSpanModal('ArcSpy 是由 Lxns Network 制作的一个爬虫工具，用于用户缓存自己的玩家数据，使用小号爬取 Best 成绩并上传至 LxBot。'));
+        bodyModal.appendChild(arcSpyModal.createSpanModal('ArcSpy 是由 Lxns Network 制作的一个爬虫工具，用于用户缓存自己的玩家数据，爬取 Best 成绩并上传至 LxBot。'));
         bodyModal.appendChild(arcSpyModal.createSpanModal("使用该工具，代表您已知晓您违反了 Arcaea 的<a href='https://arcaea.lowiro.com/zh/terms_of_service'><b>服务条款</b></a>，并且了解该工具有一定风险会导致账号被<b>封禁</b>。"));
         bodyModal.appendChild(arcSpyModal.createSpanModal("我们只建议您使用小号来查询其他账号，我们对您使用该工具造成的任何损失不予以承担任何责任。"));
 
         const modalAction = arcSpyModal.getInitializedModalAction();
 
-        const checkUpdateBtnModal = arcSpyModal.createBtnModal('检查更新', 'light');
-        checkUpdateBtnModal.addEventListener('click', () => {
-            alert("暂不支持。");
-        });
-        modalAction.appendChild(checkUpdateBtnModal);
+        const exportBtnModal = arcSpyModal.createBtnModal('导出数据', 'light');
+        exportBtnModal.addEventListener('click', openExportModal);
+        modalAction.appendChild(exportBtnModal);
 
         const resetBtnModal = arcSpyModal.createBtnModal('清空 ArcSpy 数据', 'light');
         resetBtnModal.style.color = "red";
