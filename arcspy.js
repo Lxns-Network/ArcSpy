@@ -151,6 +151,17 @@ class Modal {
         return modalBody;
     };
 
+    reinitializeModalBodyHeight() {
+        const modalContainerElement = this.modalMask.querySelector('.modal-container');
+
+        modalContainerElement.style.height = document.getElementsByClassName("modal-body")[0].offsetHeight + 140 + "px";
+        modalContainerElement.style.overflow = "hidden";
+
+        sleep(300).then(() => {
+            modalContainerElement.style.overflow = "auto";
+        });
+    };
+
     _setModalBody(body) {
         body.setAttribute(this.modalDataAttribute, '');
         body.classList.add('modal-body');
@@ -166,21 +177,15 @@ class Modal {
         modalTitleElement.textContent = title;
 
         const modalBodyElement = this.modalMask.querySelector('.modal-body');
-        modalBodyElement.innerHTML = ''; // clear the current body
-        modalBodyElement.appendChild(body); // add the new body
+        modalBodyElement.innerHTML = '';
+        modalBodyElement.appendChild(body);
 
-        const modalContainerElement = this.modalMask.querySelector('.modal-container');
-        modalContainerElement.style.height = body.offsetHeight + 140 + "px";
-        modalContainerElement.style.overflow = "hidden";
-
-        sleep(300).then(() => {
-            modalContainerElement.style.overflow = "auto";
-        });
+        this.reinitializeModalBodyHeight();
     };
 
     closeModal() {
         this.modalBody = null;
-        let _modalMask = document.getElementsByTagName("section")[0].childNodes[0];
+        const _modalMask = document.getElementsByTagName("section")[0].childNodes[0];
         _modalMask.style.transform = "scale(1.1)";
         _modalMask.style.opacity = 0;
         sleep(300).then(() => {
@@ -389,6 +394,7 @@ class Modal {
                     document.getElementById("arcspy-upload-button").style.display = "flex";
                     document.getElementById("arcspy-back-button").style.display = "flex";
                     document.getElementById("arcspy-interrupt-button").style.display = "none";
+                    arcSpyModal.reinitializeModalBodyHeight();
                     return scores;
                 } else {
                     processText.textContent = `未爬取到任何成绩，耗时 ${((end - start) / 1000).toFixed()} 秒`;
@@ -423,6 +429,7 @@ class Modal {
                             document.getElementById("arcspy-upload-button").style.display = "flex";
                             document.getElementById("arcspy-back-button").style.display = "flex";
                             document.getElementById("arcspy-interrupt-button").style.display = "none";
+                            arcSpyModal.reinitializeModalBodyHeight();
                         }
                         applyProcessPercentage(percent);
                     }
