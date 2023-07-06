@@ -379,6 +379,8 @@ class Modal {
         // 开始遍历定数，从大至小进行查询
         let index = 0;
         intervalId = setInterval(() => {
+            savePlayerScores(userId, scores);
+
             if (index >= sortedSongRatingList.length) {
                 const end = performance.now();
                 clearInterval(intervalId);
@@ -387,7 +389,6 @@ class Modal {
                     document.getElementById("arcspy-upload-button").style.display = "flex";
                     document.getElementById("arcspy-back-button").style.display = "flex";
                     document.getElementById("arcspy-interrupt-button").style.display = "none";
-                    savePlayerScores(userId, scores);
                     return scores;
                 } else {
                     processText.textContent = `未爬取到任何成绩，耗时 ${((end - start) / 1000).toFixed()} 秒`;
@@ -426,8 +427,6 @@ class Modal {
                         applyProcessPercentage(percent);
                     }
                     if (songMaxRating < playerMinRating) {
-                        console.log(scores);
-                        savePlayerScores(userId, scores);
                         clearInterval(intervalId);
                         return scores;
                     }
@@ -448,6 +447,8 @@ class Modal {
     }
 
     function savePlayerScores(userId, scores) {
+        if (scores.length == 0) return;
+
         let cachedScores = localStorage.getItem("scores");
 
         if (cachedScores == null) {
@@ -459,7 +460,6 @@ class Modal {
         cachedScores[userId] = scores;
 
         localStorage.setItem("scores", JSON.stringify(cachedScores));
-        return cachedScores;
     }
 
     function requestAPI(method, endpoint, data) {
@@ -567,11 +567,11 @@ class Modal {
 
         const modalAction = arcSpyModal.getInitializedModalAction();
 
-        const interruptBtnModal = arcSpyModal.createBtnModal('中断', 'light');
+        const interruptBtnModal = arcSpyModal.createBtnModal('保存并中断', 'light');
         interruptBtnModal.setAttribute("id", "arcspy-interrupt-button");
         interruptBtnModal.addEventListener('click', () => {
             clearInterval(intervalId);
-            alert("已中断爬取进程。");
+            alert("已保存已爬取的成绩数据并中断爬取进程。");
             openScoreQueryModal();
         });
         modalAction.appendChild(interruptBtnModal);
