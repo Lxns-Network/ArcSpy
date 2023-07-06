@@ -168,6 +168,14 @@ class Modal {
         const modalBodyElement = this.modalMask.querySelector('.modal-body');
         modalBodyElement.innerHTML = ''; // clear the current body
         modalBodyElement.appendChild(body); // add the new body
+
+        const modalContainerElement = this.modalMask.querySelector('.modal-container');
+        modalContainerElement.style.height = body.offsetHeight + 140 + "px";
+        modalContainerElement.style.overflow = "hidden";
+
+        sleep(300).then(() => {
+            modalContainerElement.style.overflow = "auto";
+        });
     };
 
     closeModal() {
@@ -243,6 +251,8 @@ class Modal {
             let _modalMask = document.getElementsByTagName("section")[0].childNodes[0];
             _modalMask.style.transform = "scale(1)";
             _modalMask.style.opacity = 1;
+
+            _modalMask.querySelector('.modal-container').style.height = body.offsetHeight + 140 + "px";
         });
     };
 }
