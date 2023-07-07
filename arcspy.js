@@ -316,15 +316,17 @@ class Modal {
         if (songList === undefined || force) {
             console.log("正在同步曲目列表...");
 
-            GM_xmlhttpRequest({
-                method: "GET",
-                url: songListUrl,
-                onload: (responseDetails) => {
-                    let response = JSON.parse(responseDetails.responseText);
+            fetch(songListUrl, {
+                method: "GET"
+            }).then(
+                response => response.json()
+            ).then(
+                response => {
+                    console.log(response);
                     songList = response;
                     localStorage.setItem("songList", JSON.stringify(response));
                 }
-            });
+            ).catch(error => alert("曲目列表同步失败。"));
         }
     }
 
@@ -470,7 +472,7 @@ class Modal {
     }
 
     function requestAPI(method, endpoint, data) {
-        let headers = null;
+        let headers = {};
         let formData = null;
 
         if (method === "POST") {
@@ -490,41 +492,51 @@ class Modal {
 
         return new Promise((resolve, reject) => {
             console.log(`> https://webapi.lowiro.com/webapi/${endpoint}`);
-            GM_xmlhttpRequest({
-                method: method,
-                url: `https://webapi.lowiro.com/webapi/${endpoint}`,
-                data: formData,
-                headers: headers,
-                onload: (responseDetails) => {
-                    const response = JSON.parse(responseDetails.responseText);
-                    console.log(response);
-                    if (saveCookie && endpoint === "user/me") {
-                        const sessionId = responseDetails.responseHeaders.match(/sid=(.+?);/)[1];
-                        savePlayerCookie(response.value.user_id, sessionId);
-                    }
-                    resolve(response);
-                },
-                onerror: (error) => reject(error)
-            });
+            if (saveCookie) {
+                GM_xmlhttpRequest({
+                    method: method,
+                    url: `https://webapi.lowiro.com/webapi/${endpoint}`,
+                    data: formData,
+                    headers: headers,
+                    onload: (responseDetails) => {
+                        const response = JSON.parse(responseDetails.responseText);
+                        console.log(response);
+                        if (saveCookie && endpoint === "user/me") {
+                            const sessionId = responseDetails.responseHeaders.match(/sid=(.+?);/)[1];
+                            savePlayerCookie(response.value.user_id, sessionId);
+                        }
+                        resolve(response);
+                    },
+                    onerror: (error) => reject(error)
+                });
+            } else {
+                fetch(`https://webapi.lowiro.com/webapi/${endpoint}`, {
+                    method: method,
+                    credentials: "include",
+                    headers: headers,
+                    body: formData
+                }).then(
+                    response => resolve(response.json())
+                ).catch(error => reject(error));
+            }
         });
     }
 
     function validateSongListUrl(testSongListUrl) {
         return new Promise((resolve) => {
-            GM_xmlhttpRequest({
-                method: 'GET',
-                url: testSongListUrl,
-                onload: (responseDetails) => {
-                    try {
-                        const testSongList = JSON.parse(responseDetails.responseText);
-                        const sortedSongRatingList = getSortedSongRatingList(testSongList);
-                        resolve(true);
-                    } catch (error) {
-                        resolve(false);
-                    }
-                },
-                onerror: (error) => resolve(false)
-            });
+
+            fetch(testSongListUrl, {
+                method: "GET"
+            }).then(
+                response => response.json()
+            ).then(
+                response => {
+                    console.log(response);
+                    const testSongList = response;
+                    const sortedSongRatingList = getSortedSongRatingList(testSongList);
+                    resolve(true);
+                }
+            ).catch(error => resolve(false));
         });
     }
 
@@ -821,23 +833,24 @@ class Modal {
 
             console.log(uploadData);
 
-            GM_xmlhttpRequest({
+            fetch("https://arcspy.lxns.net/player/sync", {
                 method: "POST",
-                url: "https://arcspy.lxns.net/player/sync",
-                data: JSON.stringify(uploadData),
-                onload: (responseDetails) => {
-                    let response = JSON.parse(responseDetails.responseText);
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(uploadData),
+            }).then(
+                response => response.json()
+            ).then(
+                response => {
                     console.log(response);
                     if (response.code != 200) {
                         alert("上传失败：" + response.message);
                     } else {
                         alert("上传成功。");
                     }
-                },
-                onerror: (error) => {
-                    alert("无法连接到服务器。");
                 }
-            });
+            ).catch(error => alert("无法连接到服务器。"));
         });
         modalAction.appendChild(uploadBtnModal);
 
