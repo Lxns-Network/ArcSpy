@@ -48,6 +48,18 @@ function parseQueryString(queryString) {
     return params;
 }
 
+function calcPotential(score=0, songRatingFloat=0) {
+    let potential;
+    if (score > 10000000) {
+        potential = songRatingFloat + 2.0;
+    } else if (score > 9800000) {
+        potential = songRatingFloat + 1.0 + (score - 9800000) / 200000;
+    } else {
+        potential = Math.max(songRatingFloat + (score - 9500000) / 300000, 0);
+    }
+    return potential;
+}
+
 class Modal {
     constructor() {
         this.modalTitle = null;
@@ -329,18 +341,6 @@ class Modal {
         }
     }
 
-    function calcPotential(score=0, songRatingFloat=0) {
-        let potential;
-        if (score > 10000000) {
-            potential = songRatingFloat + 2.0;
-        } else if (score > 9800000) {
-            potential = songRatingFloat + 1.0 + (score - 9800000) / 200000;
-        } else {
-            potential = Math.max(songRatingFloat + (score - 9500000) / 300000, 0);
-        }
-        return potential;
-    }
-
     function getSortedSongRatingList(testSongList) {
         let _songList = songList;
 
@@ -435,7 +435,7 @@ class Modal {
                         applyProcessPercentage(percent);
                     }
                     if (songMaxRating < playerMinRating) {
-                        clearInterval(intervalId);
+                        clearInterval(queryIntervalId);
                         return scores;
                     }
                 } else {
@@ -1133,14 +1133,13 @@ class Modal {
     setDefaultConfig();
     syncSongList();
 
-    const injectIntervalId = setInterval(() => {
+    setInterval(() => {
         if (/profile/.test(location.href)) {
             try {
                 document.getElementsByClassName("menu-hexagon")[0].addEventListener("click", () => {
                     if (document.getElementById("arcspy") == null) {
                         // 自动注入 ArcSpy 到侧边栏
                         initArcSpySidebarButton();
-                        clearInterval(injectIntervalId);
                     }
                 });
             } catch (error) {
