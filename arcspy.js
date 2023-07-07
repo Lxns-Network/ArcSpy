@@ -24,6 +24,30 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function downloadAsCSV(name, data) {
+    const blob = new Blob([data], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+
+    a.setAttribute('href', url)
+    a.setAttribute('download', name);
+    a.click()
+}
+
+function parseQueryString(queryString) {
+    const params = {};
+    const queries = queryString.split("&");
+
+    for (let i = 0; i < queries.length; i++) {
+        const keyValue = queries[i].split("=");
+        const key = decodeURIComponent(keyValue[0]);
+        const value = decodeURIComponent(keyValue[1] || "");
+        params[key] = value;
+    }
+
+    return params;
+}
+
 class Modal {
     constructor() {
         this.modalTitle = null;
@@ -123,7 +147,6 @@ class Modal {
     getInitializedBodyModal() {
         const bodyModal = document.createElement('div');
 
-        bodyModal.setAttribute('data-v-130d372e', '');
         bodyModal.setAttribute(this.modalDataAttribute, '');
         bodyModal.style.display = "flex";
         bodyModal.style.flexDirection = "column";
@@ -271,7 +294,7 @@ class Modal {
 
     const arcSpyModal = new Modal();
 
-    let intervalId;
+    let queryIntervalId;
 
     /*
     缓存相关
@@ -285,30 +308,6 @@ class Modal {
     let scoreQueryInterval = GM_getValue("scoreQueryInterval");
     let saveCookie = GM_getValue("saveCookie");
     let maxScoreCount = GM_getValue("maxScoreCount");
-
-    function downloadAsCSV(name, data) {
-        const blob = new Blob([data], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-
-        a.setAttribute('href', url)
-        a.setAttribute('download', name);
-        a.click()
-    }
-
-    function parseQueryString(queryString) {
-        const params = {};
-        const queries = queryString.split("&");
-
-        for (let i = 0; i < queries.length; i++) {
-            const keyValue = queries[i].split("=");
-            const key = decodeURIComponent(keyValue[0]);
-            const value = decodeURIComponent(keyValue[1] || "");
-            params[key] = value;
-        }
-
-        return params;
-    }
 
     function syncSongList(force=false) {
         let songListUrl = GM_getValue("songListUrl");
@@ -385,12 +384,12 @@ class Modal {
 
         // 开始遍历定数，从大至小进行查询
         let index = 0;
-        intervalId = setInterval(() => {
+        queryIntervalId = setInterval(() => {
             savePlayerScores(userId, scores);
 
             if (index >= sortedSongRatingList.length) {
                 const end = performance.now();
-                clearInterval(intervalId);
+                clearInterval(queryIntervalId);
                 if (scores.length !== 0) {
                     processText.textContent = `爬取了 ${scores.length} 个成绩，耗时 ${((end - start) / 1000).toFixed()} 秒`;
                     document.getElementById("arcspy-upload-button").style.display = "flex";
@@ -412,7 +411,7 @@ class Modal {
             processText.textContent = `正在查询曲目 ${song.key} [${DIFFICULTY_NAME[song.index]}]...`;
             requestAPI('GET', `${endpoint}?song_id=${song.key}&difficulty=${song.index}&start=0&limit=30`).then((response) => {
                 if (!response.success) {
-                    clearInterval(intervalId);
+                    clearInterval(queryIntervalId);
                     alert(`曲目 ${song.key} [${DIFFICULTY_NAME[song.index]}] 获取失败，错误码：${response.error_code}`);
                     openScoreQueryModal();
                     return;
@@ -1134,15 +1133,18 @@ class Modal {
     setDefaultConfig();
     syncSongList();
 
-    setInterval(() => {
+    const injectIntervalId = setInterval(() => {
         if (/profile/.test(location.href)) {
-            if (document.getElementById("arcspy") == null) {
-                try {
-                    // 自动注入 ArcSpy 到侧边栏
-                    initArcSpySidebarButton();
-                } catch (error) {
-                    return;
-                }
+            try {
+                document.getElementsByClassName("menu-hexagon")[0].addEventListener("click", () => {
+                    if (document.getElementById("arcspy") == null) {
+                        // 自动注入 ArcSpy 到侧边栏
+                        initArcSpySidebarButton();
+                        clearInterval(injectIntervalId);
+                    }
+                });
+            } catch (error) {
+                return;
             }
         }
     }, 500);
