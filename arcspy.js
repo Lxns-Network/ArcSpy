@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ArcSpy for LxBot
 // @namespace    https://github.com/Lxns-Network/ArcSpy
-// @version      0.1
+// @version      0.2
 // @description  A tool for Arcaea player to crawl their score data, and upload it to LxBot server.
 // @author       Lxns Network
 // @match        https://arcaea.lowiro.com/*/profile/*
