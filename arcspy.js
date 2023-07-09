@@ -824,11 +824,15 @@ class Modal {
                 return;
             }
 
-            const uploadData = {
+            let uploadData = {
                 player: player,
                 scores: cachedScores[player.user_id],
-                cookie: cachedCookies[player.user_id],
-            };
+                cookie: null
+            }
+
+            if (cachedCookies != null && cachedCookies[player.user_id] != undefined) {
+                uploadData.cookie = cachedCookies[player.user_id]
+            }
 
             console.log(uploadData);
 
