@@ -14,9 +14,7 @@
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
-// @connect      raw.githubusercontent.com
 // @connect      webapi.lowiro.com
-// @connect      arcspy.lxns.net
 // @connect      *
 // ==/UserScript==
 
@@ -311,7 +309,7 @@ class Modal {
     /*
     缓存相关
     */
-    let songList;
+    let songList = localStorage.getItem("songList");
 
     /*
     配置文件相关
@@ -321,24 +319,20 @@ class Modal {
     let saveCookie = GM_getValue("saveCookie");
     let maxScoreCount = GM_getValue("maxScoreCount");
 
-    function syncSongList(force=false) {
-        let songListUrl = GM_getValue("songListUrl");
+    function syncSongList() {
+        console.log("正在同步曲目列表...");
 
-        if (songList === undefined || force) {
-            console.log("正在同步曲目列表...");
-
-            fetch(songListUrl, {
-                method: "GET"
-            }).then(
-                response => response.json()
-            ).then(
-                response => {
-                    console.log(response);
-                    songList = response;
-                    localStorage.setItem("songList", JSON.stringify(response));
-                }
-            ).catch(error => alert("曲目列表同步失败。"));
-        }
+        fetch(songListUrl, {
+            method: "GET"
+        }).then(
+            response => response.json()
+        ).then(
+            response => {
+                console.log(response);
+                songList = response;
+                localStorage.setItem("songList", JSON.stringify(response));
+            }
+        ).catch(error => alert("曲目列表同步失败，请检查与该链接的连通性：" + songListUrl));
     }
 
     function getSortedSongRatingList(testSongList) {
@@ -367,12 +361,15 @@ class Modal {
 
         const cachedPlayer = getCachedPlayers().find(user => user.user_code === friendCode);
         if (cachedPlayer === undefined) {
-            alert("未在缓存中找到目标账号，请确认是否登录过目标账号并使用“缓存用户详情”功能");
+            alert("未在缓存中找到目标账号，请确认是否登录过目标账号并使用“缓存用户详情”功能。");
             return [];
         }
         const userId = cachedPlayer.user_id;
 
-        let scores = [];
+        if (songList === undefined) {
+            alert("没有检测到缓存的曲目列表，请检查曲目列表同步来源。");
+            return [];
+        }
         const sortedSongRatingList = getSortedSongRatingList();
 
         const processText = document.getElementById("arcspy-process-text");
@@ -383,6 +380,7 @@ class Modal {
         }
 
         // 开始遍历定数，从大至小进行查询
+        let scores = [];
         let index = 0;
         queryIntervalId = setInterval(() => {
             savePlayerScores(userId, scores);
@@ -399,7 +397,7 @@ class Modal {
                     return scores;
                 } else {
                     processText.textContent = `未爬取到任何成绩，耗时 ${((end - start) / 1000).toFixed()} 秒`;
-                    alert("查询了所有曲目，但未获取到任何成绩，可能是因为目标账号的排行榜被封禁");
+                    alert("查询了所有曲目，但未获取到任何成绩，可能是因为目标账号的排行榜被封禁。");
                     document.getElementById("arcspy-back-button").style.display = "flex";
                     document.getElementById("arcspy-interrupt-button").style.display = "none";
                     return [];
