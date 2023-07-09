@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ArcSpy for LxBot
 // @namespace    https://github.com/Lxns-Network/ArcSpy
-// @version      0.2
+// @version      0.3
 // @description  A tool for Arcaea player to crawl their score data, and upload it to LxBot server.
 // @author       Lxns Network
 // @match        https://arcaea.lowiro.com/*/profile/*
@@ -586,7 +586,7 @@ class Modal {
         const interruptBtnModal = arcSpyModal.createBtnModal('保存并中断', 'light');
         interruptBtnModal.setAttribute("id", "arcspy-interrupt-button");
         interruptBtnModal.addEventListener('click', () => {
-            clearInterval(intervalId);
+            clearInterval(queryIntervalId);
             alert("已保存已爬取的成绩数据并中断爬取进程。");
             openScoreQueryModal();
         });
