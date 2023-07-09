@@ -87,21 +87,25 @@ class Modal {
     };
 
     _initModalDataAttribute() {
-        document.styleSheets.forEach((sheet, i) => {
-            if (sheet.href == null) {
-                return;
-            }
-            if (sheet.href.indexOf("index") !== -1) {
-                sheet.rules.forEach((rule, j) => {
-                    if (rule.selectorText == null) {
-                        return;
-                    }
-                    if (rule.selectorText.indexOf(".modal-wrapper") !== -1) {
-                        this.modalDataAttribute = rule.selectorText.replace(/\.modal-wrapper\[(.+)\]/, "$1");
-                    }
-                });
-            }
-        });
+        try {
+            document.styleSheets.forEach((sheet, i) => {
+                if (sheet.href == null) {
+                    return;
+                }
+                if (sheet.href.indexOf("index") !== -1) {
+                    sheet.rules.forEach((rule, j) => {
+                        if (rule.selectorText == null) {
+                            return;
+                        }
+                        if (rule.selectorText.indexOf(".modal-wrapper") !== -1) {
+                            this.modalDataAttribute = rule.selectorText.replace(/\.modal-wrapper\[(.+)\]/, "$1");
+                        }
+                    });
+                }
+            });
+        } catch (e) {
+            sleep(300).then(() => self._initModalDataAttribute());
+        }
     };
 
     createInputModal() {
@@ -195,9 +199,7 @@ class Modal {
         modalContainerElement.style.height = document.getElementsByClassName("modal-body")[0].offsetHeight + 140 + "px";
         modalContainerElement.style.overflow = "hidden";
 
-        sleep(300).then(() => {
-            modalContainerElement.style.overflow = "auto";
-        });
+        sleep(300).then(() => modalContainerElement.style.overflow = "auto");
     };
 
     _setModalBody(body) {
@@ -226,9 +228,7 @@ class Modal {
         const _modalMask = document.getElementsByTagName("section")[0].childNodes[0];
         _modalMask.style.transform = "scale(1.1)";
         _modalMask.style.opacity = 0;
-        sleep(300).then(() => {
-            _modalMask.remove();
-        });
+        sleep(300).then(() => _modalMask.remove());
     };
 
     createModal(title, body) {
