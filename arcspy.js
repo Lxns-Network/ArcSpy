@@ -87,25 +87,21 @@ class Modal {
     };
 
     _initModalDataAttribute() {
-        try {
-            document.styleSheets.forEach((sheet, i) => {
-                if (sheet.href == null) {
-                    return;
-                }
-                if (sheet.href.indexOf("index") !== -1) {
-                    sheet.rules.forEach((rule, j) => {
-                        if (rule.selectorText == null) {
-                            return;
-                        }
-                        if (rule.selectorText.indexOf(".modal-wrapper") !== -1) {
-                            this.modalDataAttribute = rule.selectorText.replace(/\.modal-wrapper\[(.+)\]/, "$1");
-                        }
-                    });
-                }
-            });
-        } catch (e) {
-            sleep(300).then(() => self._initModalDataAttribute());
-        }
+        document.styleSheets.forEach((sheet, i) => {
+            if (sheet.href == null) {
+                return;
+            }
+            if (sheet.href.indexOf("index") !== -1) {
+                sheet.rules.forEach((rule, j) => {
+                    if (rule.selectorText == null) {
+                        return;
+                    }
+                    if (rule.selectorText.indexOf(".modal-wrapper") !== -1) {
+                        this.modalDataAttribute = rule.selectorText.replace(/\.modal-wrapper\[(.+)\]/, "$1");
+                    }
+                });
+            }
+        });
     };
 
     createInputModal() {
