@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ArcSpy for LxBot
 // @namespace    https://github.com/Lxns-Network/ArcSpy
-// @version      0.3.1
+// @version      0.3.2
 // @description  A tool for Arcaea player to crawl their score data, and upload it to LxBot server.
 // @author       Lxns Network
 // @match        https://arcaea.lowiro.com/*/profile/*
@@ -1067,7 +1067,7 @@ class Modal {
         modalBody.appendChild(bodyModal);
         modalBody.appendChild(modalAction);
 
-        const copyrightSpan = arcSpyModal.createSpanModal(`ArcSpy v${GM_info.script.version} © 2023 Lxns Network`, 'center');
+        const copyrightSpan = arcSpyModal.createSpanModal(`ArcSpy v0.3.2 © 2023 Lxns Network`, 'center');
         copyrightSpan.style.width = "100%";
         copyrightSpan.style.fontSize = "12px";
         copyrightSpan.style.color = "gray";
